@@ -1,0 +1,88 @@
+version: "3.9"
+
+services:
+
+  rabbitmq:
+    build:
+      context: ./docker/rabbitmq
+      args:
+        DK_UID: ${DK_UID}
+        DK_GID: ${DK_GID}
+    container_name: "${DK_PROJECT_NAME}-rabbitmq"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    ports:
+      - "${RABBITMQ_PORT:-5672}:5672"
+      - "${RABBITMQ_MANAGER_PORT:-8080}:15672"
+    networks:
+      - backend
+
+  api:
+    build:
+      context: ./api
+      args:
+        DK_UID: ${DK_UID}
+        DK_GID: ${DK_GID}
+    container_name: "${DK_PROJECT_NAME}-api"
+    environment:
+      DEBUG: "api:*"
+      PORT: ${API_PORT}
+      RABBIT_HOST: 'rabbitmq'
+      RABBIT_PORT: ${RABBITMQ_PORT}
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    volumes:
+      - ${PWD}/api:/application
+    ports:
+      - "${API_PORT}:${API_PORT}"
+    networks:
+      - backend
+    depends_on:
+      rabbitmq:
+        condition: service_started
+    command: ["npm", "run", "dev"]
+
+  webapp:
+    build:
+      context: ./webapp
+      args:
+        DK_UID: ${DK_UID}
+        DK_GID: ${DK_GID}
+    container_name: "${DK_PROJECT_NAME}-webapp"
+    ports:
+      - "${WEBAPP_PORT}:${WEBAPP_PORT}"
+    restart: "on-failure"
+    volumes:
+      - ${PWD}/webapp:/application
+    networks:
+      - backend
+    depends_on:
+      api:
+        condition: service_started
+    command: ["/usr/bin/php", "-S", "0.0.0.0:${WEBAPP_PORT}", "-t", "/application/public"]
+
+  worker:
+    build:
+      context: ./worker
+      args:
+        DK_UID: ${DK_UID}
+        DK_GID: ${DK_GID}
+    deploy:
+      replicas: 8
+    volumes:
+      - ${PWD}/worker:/application
+    environment:
+      RABBIT_HOST: 'rabbitmq'
+      RABBIT_PORT: ${RABBITMQ_PORT}
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    networks:
+      - backend
+    depends_on:
+      rabbitmq:
+        condition: service_started
+    command: ["npm", "run", "dev"]
+
+networks:
+  backend:

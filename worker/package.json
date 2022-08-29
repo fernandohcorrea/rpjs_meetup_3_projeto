@@ -1,0 +1,21 @@
+{
+  "name": "worker",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "nodemon ./app.js",
+    "start": "node ./app.js",
+    "predev": "echo \"Wait-for: $RABBIT_HOST:$RABBIT_PORT\" && ./wait-for -t 30 \"$RABBIT_HOST:$RABBIT_PORT\" ",
+    "prestart": "echo \"Wait-for: $RABBIT_HOST:$RABBIT_PORT\" && ./wait-for -t 30 \"$RABBIT_HOST:$RABBIT_PORT\" "
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "node_modules/*"
+    ],
+    "delay": 500
+  },
+  "dependencies": {
+    "amqplib": "^0.10.2",
+    "nodemon": "^2.0.19"
+  }
+}
