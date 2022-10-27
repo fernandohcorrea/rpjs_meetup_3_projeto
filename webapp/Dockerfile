@@ -12,4 +12,6 @@ WORKDIR "/application"
 
 COPY public public
 
+ENV API_URL="http://localhost:3030"
+
 CMD ["/usr/bin/php", "-S", "0.0.0.0:8181", "-t", "/application/public"]

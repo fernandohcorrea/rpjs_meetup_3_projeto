@@ -26,7 +26,7 @@ $(function() {
             };
 
             $.ajax({
-                url : 'http://localhost:3000/users',
+                url : `${apiUrl}/users`,
                 method: 'POST',
                 data : data,
                 success : function(a,b,c){

@@ -50,6 +50,8 @@ services:
         DK_UID: ${DK_UID}
         DK_GID: ${DK_GID}
     container_name: "${DK_PROJECT_NAME}-webapp"
+    environment:
+      API_URL: "http://localhost:${API_PORT}"
     ports:
       - "${WEBAPP_PORT}:${WEBAPP_PORT}"
     restart: "on-failure"
@@ -69,7 +71,7 @@ services:
         DK_UID: ${DK_UID}
         DK_GID: ${DK_GID}
     deploy:
-      replicas: 8
+      replicas: 1
     volumes:
       - ${PWD}/worker:/application
     environment:

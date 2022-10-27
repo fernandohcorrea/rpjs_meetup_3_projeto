@@ -9,7 +9,9 @@
   <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
   <meta name="generator" content="Hugo 0.101.0">
   <title>Signin Template · Bootstrap v4.6</title>
-
+  <script>
+    const apiUrl = "<?=getenv('API_URL')?>";
+  </script>
   <link rel="canonical" href="https://getbootstrap.com/docs/4.6/examples/sign-in/">
 
 
